@@ -1,0 +1,60 @@
+import numpy as np
+import matplotlib.pyplot as plt
+ciudades = {
+    "Paris": {"coords": [0, 0], "costo_vida": 1226.3, "renta": 1489.84, "criminalidad": 55.32, "seguridad": 44.68, "sanidad": 9, "transporte": 9, "supermercados": 8, "calidad_aire": 7},
+    "Berlín": {"coords": [3.641419779575, 2.0331286406079], "costo_vida": 1125.2, "renta": 1358.96, "criminalidad": 38.99, "seguridad": 61.01, "sanidad": 7, "transporte": 9, "supermercados": 8, "calidad_aire": 9},
+    "Madrid": {"coords": [-2.6431848734368, -4.2082205872014], "costo_vida": 885.7, "renta": 1406.21, "criminalidad": 35.77, "seguridad": 64.23, "sanidad": 9, "transporte": 8, "supermercados": 8, "calidad_aire": 9},
+    "Londres": {"coords": [-0.767312382391, 1.4717270962134], "costo_vida": 1416.9, "renta": 2391.49, "criminalidad": 47.76, "seguridad": 52.24, "sanidad": 8, "transporte": 10, "supermercados": 9, "calidad_aire": 6},
+    "Lisboa": {"coords": [-4.8104568479702, -4.7305835237589], "costo_vida": 818.5, "renta": 1590.68, "criminalidad": 31.17, "seguridad": 68.83, "sanidad": 8, "transporte": 7, "supermercados": 7, "calidad_aire": 8},
+    "Dublín": {"coords": [-2.6512906935772, 2.9111711991421], "costo_vida": 1208.3, "renta": 2191.70, "criminalidad": 46.83, "seguridad": 53.17, "sanidad": 4, "transporte": 6, "supermercados": 6, "calidad_aire": 10},
+    "Ámsterdam": {"coords": [1.0848618254628, 1.8263389801438], "costo_vida": 1196.9, "renta": 2264.08, "criminalidad": 26.42, "seguridad": 73.58, "sanidad": 10, "transporte": 8, "supermercados": 7, "calidad_aire": 7},
+    "Bruselas": {"coords": [0.8414780855881, 1.0483611835873], "costo_vida": 1135.7, "renta": 1214.43, "criminalidad": 49.70, "seguridad": 50.30, "sanidad": 9, "transporte": 7, "supermercados": 7, "calidad_aire": 6},
+    "Luxemburgo": {"coords": [1.3513848725871, 0.3815035141541], "costo_vida": 1108.7, "renta": 2017.00, "criminalidad": 34.28, "seguridad": 65.72, "sanidad": 9, "transporte": 6, "supermercados": 6, "calidad_aire": 9},
+    "Bern": {"coords": [1.8787245715221, -0.9837951970179], "costo_vida": 1701.7, "renta": 1430.29, "criminalidad": 26.09, "seguridad": 73.91, "sanidad": 8, "transporte": 7, "supermercados": 6, "calidad_aire": 9},
+    "Mónaco": {"coords": [1.6882099108403, -2.8042686213101], "costo_vida": 1962.0, "renta": 6587.32, "criminalidad": 23.76, "seguridad": 76.24, "sanidad": 2, "transporte": 5, "supermercados": 5, "calidad_aire": 7},
+    "Roma": {"coords": [3.8420839913256, -3.6139559292076], "costo_vida": 938.8, "renta": 1228.11, "criminalidad": 47.10, "seguridad": 52.90, "sanidad": 6, "transporte": 6, "supermercados": 7, "calidad_aire": 6},
+    "Viena": {"coords": [4.9143771867753, -0.1515425800945], "costo_vida": 1178.3, "renta": 1152.20, "criminalidad": 29.41, "seguridad": 70.59, "sanidad": 9, "transporte": 9, "supermercados": 8, "calidad_aire": 8},
+    "Praga": {"coords": [4.1610990119887, 0.7580151661795], "costo_vida": 904.6, "renta": 1160.89, "criminalidad": 26.81, "seguridad": 73.19, "sanidad": 9, "transporte": 8, "supermercados": 7, "calidad_aire": 8},
+    "Copenhague": {"coords": [3.2339529183707, 3.7506664151442], "costo_vida": 1267.7, "renta": 1791.88, "criminalidad": 26.11, "seguridad": 73.89, "sanidad": 10, "transporte": 9, "supermercados": 7, "calidad_aire": 9}
+}
+def f_costo_vida(ciudad):
+    return ciudad['costo_vida']
+def f_seguridad(ciudad):
+    return ciudad['seguridad']
+def f_sanidad(ciudad):
+    return ciudad['sanidad']
+def f_transporte(ciudad):
+    return ciudad['transporte']
+def f_supermercados(ciudad):
+    return ciudad['supermercados']
+def f_calidad_aire(ciudad):
+    return ciudad['calidad_aire']
+def f_objetivo(x, y, ciudades, w1, w2, w3, w4, w5, w6):
+    valor = 0
+    for ciudad, datos in ciudades.items():
+        dx = x - datos['coords'][0]
+        dy = y - datos['coords'][1]
+        distancia = np.sqrt(dx**2 + dy**2) + 0.1 
+        valor += (w1 * f_costo_vida(datos) +
+                  w2 * f_seguridad(datos) +
+                  w3 * f_sanidad(datos) +
+                  w4 * f_transporte(datos) +
+                  w5 * f_supermercados(datos) +
+                  w6 * f_calidad_aire(datos)) / distancia
+    return valor
+w1, w2, w3, w4, w5, w6 = 0.02, 0.02, 0.02, 0.02, 0.01, 0.01
+def generar_curvas_nivel():
+    x_vals = np.linspace(-10, 10, 400)
+    y_vals = np.linspace(-10, 10, 400)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = np.vectorize(lambda x, y: f_objetivo(x, y, ciudades, w1, w2, w3, w4, w5, w6))(X, Y)
+    plt.contour(X, Y, Z, levels=50, cmap='viridis')  
+    plt.colorbar(label='Valor Objetivo')
+    for ciudad, datos in ciudades.items():
+        plt.scatter(datos['coords'][0], datos['coords'][1], label=ciudad)
+    plt.legend()
+    plt.title("Curvas de Nivel para la Optimización de Zonas Residenciales")
+    plt.xlabel("X (Coordenada Este-Oeste)")
+    plt.ylabel("Y (Coordenada Norte-Sur)")
+    plt.show()
+generar_curvas_nivel()
