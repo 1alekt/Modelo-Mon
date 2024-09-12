@@ -1,0 +1,65 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+ciudades = {
+    'Costa del Este': {'coords': (18.574, -2.265), 'costo_vida': 2000, 'seguridad': 80, 'sanidad': 85, 'transporte': 70, 'supermercados': 75, 'calidad_aire': 90},
+    'Clayton': {'coords': (-10.834, -5.832), 'costo_vida': 2000, 'seguridad': 85, 'sanidad': 90, 'transporte': 60, 'supermercados': 65, 'calidad_aire': 85},
+    'Albrook': {'coords': (-7.474, -12.284), 'costo_vida': 2000, 'seguridad': 75, 'sanidad': 80, 'transporte': 65, 'supermercados': 70, 'calidad_aire': 80},
+    'San Francisco': {'coords': (7.525, -7.095), 'costo_vida': 1200, 'seguridad': 70, 'sanidad': 75, 'transporte': 85, 'supermercados': 80, 'calidad_aire': 75},
+    'Betania': {'coords': (1.262, -4.191), 'costo_vida': 1000, 'seguridad': 65, 'sanidad': 70, 'transporte': 75, 'supermercados': 85, 'calidad_aire': 70},
+    'Paitilla': {'coords': (4.529, -12.777), 'costo_vida': 2000, 'seguridad': 80, 'sanidad': 85, 'transporte': 80, 'supermercados': 75, 'calidad_aire': 85},
+    'Bella Vista': {'coords': (0.880, -10.509), 'costo_vida': 1000, 'seguridad': 70, 'sanidad': 75, 'transporte': 70, 'supermercados': 80, 'calidad_aire': 70},
+    'Casco Viejo': {'coords': (-1.705, -19.995), 'costo_vida': 1500, 'seguridad': 60, 'sanidad': 65, 'transporte': 55, 'supermercados': 60, 'calidad_aire': 65},
+    'Tumba Muerto': {'coords': (-1.800, -5.542), 'costo_vida': 700, 'seguridad': 50, 'sanidad': 55, 'transporte': 60, 'supermercados': 70, 'calidad_aire': 55},
+    'Vía España': {'coords': (11.139, 1.708), 'costo_vida': 900, 'seguridad': 65, 'sanidad': 60, 'transporte': 75, 'supermercados': 70, 'calidad_aire': 65},
+    'Villa Lucre': {'coords': (17.632, 6.037), 'costo_vida': 800, 'seguridad': 60, 'sanidad': 65, 'transporte': 70, 'supermercados': 65, 'calidad_aire': 60}
+}
+
+def f_costo_vida(ciudad):
+    return ciudad['costo_vida']
+def f_seguridad(ciudad):
+    return ciudad['seguridad']
+def f_sanidad(ciudad):
+    return ciudad['sanidad']
+def f_transporte(ciudad):
+    return ciudad['transporte']
+def f_supermercados(ciudad):
+    return ciudad['supermercados']
+def f_calidad_aire(ciudad):
+    return ciudad['calidad_aire']
+def f_objetivo(x, y, ciudades, w1, w2, w3, w4, w5, w6):
+    valor = 0
+    for ciudad, datos in ciudades.items():
+        dx = x - datos['coords'][0]
+        dy = y - datos['coords'][1]
+        distancia = np.sqrt(dx**2 + dy**2) + 0.1  # Evitar división por cero
+        valor += (w1 * f_costo_vida(datos) +
+                  w2 * f_seguridad(datos) +
+                  w3 * f_sanidad(datos) +
+                  w4 * f_transporte(datos) +
+                  w5 * f_supermercados(datos) +
+                  w6 * f_calidad_aire(datos)) / distancia
+    return valor
+w1, w2, w3, w4, w5, w6 = 0.02, 0.02, 0.02, 0.02, 0.01, 0.01
+
+def generar_curvas_nivel():
+    x_vals = np.linspace(-25, 25, 400)
+    y_vals = np.linspace(-25, 25, 400)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    
+    Z = np.vectorize(lambda x, y: f_objetivo(x, y, ciudades, w1, w2, w3, w4, w5, w6))(X, Y)
+    
+    plt.contour(X, Y, Z, levels=80, cmap='viridis')
+    plt.colorbar(label='Valor Objetivo')
+
+    # Marcadores para las ciudades
+    for ciudad, datos in ciudades.items():
+        plt.scatter(datos['coords'][0], datos['coords'][1], label=ciudad)
+    
+    plt.legend()
+    plt.title("Curvas de Nivel para la Optimización de Zonas Residenciales")
+    plt.xlabel("X (Coordenada Este-Oeste)")
+    plt.ylabel("Y (Coordenada Norte-Sur)")
+    plt.show()
+
+generar_curvas_nivel()
